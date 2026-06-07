@@ -30,6 +30,7 @@ static const ocv_map_t lifepo4_soc_table[] = {
 
 static adc_oneshot_unit_handle_t adc_handle;
 static adc_cali_handle_t cali_handle;
+static adc_channel_t s_battery_channel;
 static bool cali_enabled;
 
 static esp_err_t adc_calibration_init(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten,
@@ -63,10 +64,11 @@ esp_err_t battery_init(void)
         .atten = ADC_ATTEN_DB_12,
         .bitwidth = ADC_BITWIDTH_DEFAULT,
     };
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, ADC_CHANNEL_0, &chan_cfg));
-    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, ADC_CHANNEL_1, &chan_cfg));
+    adc_unit_t unit = ADC_UNIT_1;
+    ESP_ERROR_CHECK(adc_oneshot_io_to_channel(PIN_PWR_ADC, &unit, &s_battery_channel));
+    ESP_ERROR_CHECK(adc_oneshot_config_channel(adc_handle, s_battery_channel, &chan_cfg));
 
-    cali_enabled = adc_calibration_init(ADC_UNIT_1, ADC_CHANNEL_0, ADC_ATTEN_DB_12, &cali_handle) == ESP_OK;
+    cali_enabled = adc_calibration_init(unit, s_battery_channel, ADC_ATTEN_DB_12, &cali_handle) == ESP_OK;
     ESP_LOGI(TAG, "ADC on GPIO%d, calibration %s", PIN_PWR_ADC, cali_enabled ? "enabled" : "disabled");
     return ESP_OK;
 }
@@ -83,7 +85,7 @@ esp_err_t battery_read_mv(int *voltage_mv)
     }
 
     int raw = 0;
-    ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, ADC_CHANNEL_0, &raw));
+    ESP_ERROR_CHECK(adc_oneshot_read(adc_handle, s_battery_channel, &raw));
 
     int adc_mv = 0;
     if (cali_enabled) {

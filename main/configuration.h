@@ -1,7 +1,5 @@
 #pragma once
 
-#include "driver/gpio.h"
-
 // ============================================================================
 // ESP32-C3 SUPERMINI GREENHOUSE CONTROLLER PIN CONFIGURATION
 // ============================================================================
@@ -39,7 +37,7 @@
 #define PERIPHERAL_POWER_ON_MS      500
 #define VALVE_TIMEOUT_MS            5000
 #define SENSOR_POLL_INTERVAL_MS     5000
-#define CONFIG_SLEEP_INTERVAL_MIN 10
+#define CONFIG_SLEEP_INTERVAL_MIN   10
 
 // ============================================================================
 // BATTERY ADC (BAT - 47K - PWR_ADC - 100K - GND)
@@ -53,7 +51,7 @@
 // SOIL MOISTURE ADC (sensor - 22K - ADC - 100K - GND)
 // Testing: 0 raw = 0%, max raw = 100%. Calibrate endpoints later.
 // ============================================================================
-#define SOIL_DIVIDER_R1_OHMS        22000
-#define SOIL_DIVIDER_R2_OHMS        100000
-#define SOIL_ADC_MAX_RAW            4095
+#define SOIL_ADC_MIN                    819    // 100%
+#define SOIL_ADC_MAX                    2334   // 0%
+#define SOIL_BATTERY_CALIBRATION_LEVEL  3300   // mV, voltage level at which the soil moisture sensor MIN/MAX values are calibrated
 
